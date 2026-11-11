@@ -50,13 +50,13 @@ export default function Navbar() {
                     <div className="h-4 w-px bg-zinc-700/80" />
 
                     {/* Sign In Link */}
-                    <Link href="/signin" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300">
+                    <Link href="/signIn" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300">
                         <span>Sign In</span>
                     </Link>
 
                     {/* Glowing Gradient Get Started Button */}
                     <Link
-                        href="/signup"
+                        href="/signUp"
                         className="flex items-center gap-2 rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-600/30 transition-all duration-200 hover:opacity-95 hover:shadow-indigo-500/50 active:scale-[0.98]"
                     >
                         <span>Get Started</span>
