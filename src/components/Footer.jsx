@@ -1,4 +1,7 @@
+"use client"
 import Link from "next/link";
+import * as motion from "motion/react-client"
+import { Box } from "@gravity-ui/icons";
 
 const footerSections = [
     {
@@ -36,7 +39,7 @@ export default function Footer() {
                     {/* Brand Column */}
                     <div className="lg:col-span-5">
                         <Link href="/" className="group inline-flex items-center gap-2">
-                            <div className="flex items-baseline text-2xl font-black tracking-tight">
+                            <motion.div style={Box} animate={{ rotate: 360 }} transition={{ duration: 1 }} className="flex items-baseline text-2xl font-black tracking-tight">
                                 <span className="text-[#0080FF] transition group-hover:brightness-110">hire</span>
                                 <div className="relative inline-flex items-center">
                                     <span className="text-[#0080FF] transition group-hover:brightness-110">l</span>
@@ -46,7 +49,7 @@ export default function Footer() {
                                     </div>
                                     <span className="text-[#FF6600] transition group-hover:brightness-110">p</span>
                                 </div>
-                            </div>
+                            </motion.div>
                         </Link>
 
                         <p className="mt-6 max-w-sm text-sm leading-relaxed text-zinc-500">The AI-native career platform. Built for people who take their work seriously.</p>
