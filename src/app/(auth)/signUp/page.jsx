@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
+import { Label, Radio, RadioGroup } from "@heroui/react";
 
 export default function SignUp() {
     const [loading, setLoading] = useState(false);
@@ -22,6 +24,8 @@ export default function SignUp() {
                 name: e.target.name.value,
                 email: e.target.email.value,
                 password: e.target.password.value,
+                role: e.target.role.value,
+                callbackURL: "/"
             });
 
             if (error) {
@@ -34,6 +38,7 @@ export default function SignUp() {
             setError("Unable to create your account. Please try again.");
         } finally {
             setLoading(false);
+            redirect("/signIn");
         }
     };
 
@@ -105,6 +110,28 @@ export default function SignUp() {
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-zinc-400 hover:text-white">
                             {showPassword ? "Hide" : "Show"}
                         </button>
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                        <Label>Select your role:</Label>
+                        <RadioGroup defaultValue="seeker" name="role" orientation="horizontal">
+                            <Radio value="seeker">
+                                <Radio.Content>
+                                    <Radio.Control>
+                                        <Radio.Indicator />
+                                    </Radio.Control>
+                                    Job Seeker
+                                </Radio.Content>
+                            </Radio>
+                            <Radio value="recruiter">
+                                <Radio.Content>
+                                    <Radio.Control>
+                                        <Radio.Indicator />
+                                    </Radio.Control>
+                                    Recruiter
+                                </Radio.Content>
+                            </Radio>
+                        </RadioGroup>
                     </div>
 
                     {/* Error Message */}
