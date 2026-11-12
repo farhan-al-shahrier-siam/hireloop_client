@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Button, Switch } from "@heroui/react";
+import { Button, Switch, toast } from "@heroui/react";
 import { ArrowRight, Factory, Globe, MapPin, Calendar, ChevronRight, ChevronDown } from "@gravity-ui/icons";
+import { createJob } from "@/lib/actions/jobs";
+import { redirect } from "next/navigation";
 
 export default function PostJobPage() {
     // Central form state holding all input values
@@ -44,20 +46,26 @@ export default function PostJobPage() {
     };
 
     // Submission function gathering all collected data
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e?.preventDefault();
 
         const payload = {
             ...formData,
             minSalary: Number(formData.minSalary) || 0,
             maxSalary: Number(formData.maxSalary) || 0,
+            companyId: "company_123",
+            status: "active",
+            isPubliclyVisible: true,
             submittedAt: new Date().toISOString(),
         };
 
-        console.log("Collected Form Data:", payload);
-        alert(JSON.stringify(payload, null, 2));
 
-        return payload;
+        const res = await createJob(payload)
+        if(res.insertedId){
+            toast.success("Job posted Successfully!")
+            e.target.reset()
+            // redirect("/dashboard/recruiter")
+        }
     };
 
     const jobTypes = [
