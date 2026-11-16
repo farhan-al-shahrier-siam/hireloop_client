@@ -1,10 +1,14 @@
 import JobsTable from "@/components/recruiter/JobsTable";
+import { getRecruiterCompany } from "@/lib/api/companies";
 import { getCompanyJobs } from "@/lib/api/jobs";
+import { getUserSession } from "@/lib/core/session";
 import React from "react";
 
 const RecruiterJobs = async () => {
-    const companyId = "company_123";
-    const jobs = await getCompanyJobs(companyId);
+
+    const user = await getUserSession();
+    const company = await getRecruiterCompany(user?.id)
+    const jobs = await getCompanyJobs(company._id);
     console.log(jobs);
 
     return (
