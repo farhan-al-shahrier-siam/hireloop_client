@@ -1,6 +1,8 @@
 import { getUserSession } from "@/lib/core/session";
 import { redirect } from "next/navigation";
 import React from "react";
+import JobApplyForm from "./JobApplyForm";
+import { getJobById } from "@/lib/api/jobs";
 
 const ApplyPage = async ({ params }) => {
     const { id } = await params;
@@ -16,7 +18,11 @@ const ApplyPage = async ({ params }) => {
         </div>
     }
 
-    return <div>Apply page</div>;
+    const job = await getJobById(id)
+
+    return <div className="w-full min-h-screen flex flex-col items-center justify-center">
+        <JobApplyForm applicant={user} job={job}></JobApplyForm>
+    </div>;
 };
 
 export default ApplyPage;
