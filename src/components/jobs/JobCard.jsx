@@ -117,7 +117,7 @@ export default function JobCard({ job }) {
         {/* Apply Now Link */}
         <div className="pt-3">
           <Link
-            href={`/jobs/${_id}/apply`}
+            href={`/jobs/${_id}`}
             className="group inline-flex items-center gap-2.5 text-base font-medium text-white transition-colors hover:text-[#e5a9f7]"
           >
             <span>Apply Now</span>
