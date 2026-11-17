@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { Label, Radio, RadioGroup } from "@heroui/react";
 
 export default function SignUp() {
@@ -11,6 +11,10 @@ export default function SignUp() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get("redirect") || "/signIn";
 
     const handleSignUp = async (e) => {
         e.preventDefault();
@@ -25,7 +29,6 @@ export default function SignUp() {
                 email: e.target.email.value,
                 password: e.target.password.value,
                 role: e.target.role.value,
-                callbackURL: "/"
             });
 
             if (error) {
@@ -38,7 +41,7 @@ export default function SignUp() {
             setError("Unable to create your account. Please try again.");
         } finally {
             setLoading(false);
-            redirect("/signIn");
+            router.push(redirectTo);
         }
     };
 
@@ -161,7 +164,7 @@ export default function SignUp() {
                 {/* Login Link */}
                 <p className="mt-7 text-center text-sm text-zinc-400">
                     Already have an account?{" "}
-                    <Link href="/signIn" className="font-medium text-white transition hover:text-violet-400">
+                    <Link href={redirectTo === "/signIn" ? `/signIn` : `/signIn?redirect=${redirectTo}`} className="font-medium text-white transition hover:text-violet-400">
                         Sign in
                     </Link>
                 </p>

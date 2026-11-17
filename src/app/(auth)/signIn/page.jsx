@@ -3,12 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignIn() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get("redirect")|| "/";
 
     const handleSignIn = async (e) => {
         e.preventDefault();
@@ -27,9 +32,8 @@ export default function SignIn() {
                 setError(error.message || "Invalid email or password.");
             } else {
                 setSuccess("Signed in successfully!");
+                router.push(redirectTo)
 
-                // Redirect after successful sign in
-                window.location.href = "/";
             }
         } catch (err) {
             setError("Unable to sign in. Please try again.");
@@ -111,7 +115,7 @@ export default function SignIn() {
                 {/* Sign Up Link */}
                 <p className="mt-7 text-center text-sm text-zinc-400">
                     Don&apos;t have an account?{" "}
-                    <Link href="/signUp" className="font-medium text-violet-400 transition hover:text-violet-300">
+                    <Link href={ redirectTo==="/"? `/signUp` : `/signUp?redirect=${redirectTo}` } className="font-medium text-violet-400 transition hover:text-violet-300">
                         Create Account
                     </Link>
                 </p>
