@@ -11,7 +11,7 @@ import { Box } from "@gravity-ui/icons";
 const navLinks = [
     { label: "Browse Jobs", href: "/jobs" },
     { label: "Companies", href: "/companies" },
-    { label: "Pricing", href: "/pricing" },
+    { label: "Pricing", href: "/plans" },
 ];
 
 export default function Navbar() {

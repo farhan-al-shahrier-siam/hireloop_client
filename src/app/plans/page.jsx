@@ -24,7 +24,7 @@ const PRICING_DATA = {
             description: "More monthly applications and deeper insights to land faster.",
             popular: true,
             ctaText: "Upgrade to Pro",
-            ctaHref: "/signUp?role=seeker&plan=pro",
+            ctaHref: "/api/checkout_sessions",
             features: ["Apply to up to 30 jobs per month", "Unlimited saved jobs", "Application tracking", "Salary insights"],
         },
         {
@@ -188,15 +188,19 @@ export default function PlansPage() {
 
                                 {/* CTA Button */}
                                 <div className="pt-4">
-                                    <Link
-                                        href={plan.ctaHref}
-                                        className={`group flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all ${
-                                            plan.popular ? "bg-[#e5a9f7] text-zinc-950 hover:bg-[#d88ef0]" : "bg-[#222222] text-white hover:bg-[#2c2c2c] hover:text-[#e5a9f7]"
-                                        }`}
-                                    >
-                                        <span>{plan.ctaText}</span>
-                                        <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                                    </Link>
+                                    <form action={plan.ctaHref} method="POST" className="w-full">
+                                        <button
+                                            type="submit"
+                                            className={`group flex w-full cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${
+                                                plan.popular
+                                                    ? "bg-[#e5a9f7] text-zinc-950 hover:bg-[#d88ef0] shadow-lg shadow-[#e5a9f7]/15"
+                                                    : "bg-[#222222] text-white hover:bg-[#2c2c2c] hover:text-[#e5a9f7]"
+                                            }`}
+                                        >
+                                            <span>{plan.ctaText}</span>
+                                            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                                        </button>
+                                    </form>
                                 </div>
                             </Card.Content>
                         </Card>
