@@ -17,30 +17,14 @@ import {
     CircleCheck,
     CircleXmark, // <-- Changed from CircleX
     Plus,
-    Xmark,       // <-- Note: Gravity UI uses Xmark instead of X
+    Xmark, // <-- Note: Gravity UI uses Xmark instead of X
 } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client"; // Adjust path to your Better Auth client
 import { createCompany } from "@/lib/actions/companies";
 
-const INDUSTRIES = [
-    "Technology",
-    "Finance & Fintech",
-    "Healthcare",
-    "E-Commerce & Retail",
-    "Education",
-    "Manufacturing",
-    "Media & Entertainment",
-    "Consulting & Services",
-];
+const INDUSTRIES = ["Technology", "Finance & Fintech", "Healthcare", "E-Commerce & Retail", "Education", "Manufacturing", "Media & Entertainment", "Consulting & Services"];
 
-const EMPLOYEE_RANGES = [
-    "1-10 employees",
-    "11-50 employees",
-    "51-200 employees",
-    "201-500 employees",
-    "501-1000 employees",
-    "1000+ employees",
-];
+const EMPLOYEE_RANGES = ["1-10 employees", "11-50 employees", "51-200 employees", "201-500 employees", "501-1000 employees", "1000+ employees"];
 
 const STATUS_CONFIG = {
     Pending: {
@@ -80,9 +64,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
     const [formData, setFormData] = useState({
         name: initialCompany?.name || "",
         industry: initialCompany?.industry || "Technology",
-        websiteUrl: initialCompany?.websiteUrl
-            ? initialCompany.websiteUrl.replace(/^https?:\/\//, "")
-            : "",
+        websiteUrl: initialCompany?.websiteUrl ? initialCompany.websiteUrl.replace(/^https?:\/\//, "") : "",
         location: initialCompany?.location || "",
         employeeCount: initialCompany?.employeeCount || "1-10 employees",
         logo: initialCompany?.logo || "",
@@ -137,13 +119,10 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
             const body = new FormData();
             body.append("image", file);
 
-            const res = await fetch(
-                `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
-                {
-                    method: "POST",
-                    body,
-                }
-            );
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+                method: "POST",
+                body,
+            });
             const data = await res.json();
 
             if (!data.success) {
@@ -169,13 +148,13 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
         const payload = {
             ...formData,
             websiteUrl: cleanDomain ? `https://${cleanDomain}` : "",
-            recruiterId: recruiter.id
+            status: initialCompany && initialCompany.status ? initialCompany.status : "Pending",
+            recruiterId: recruiter.id,
         };
         console.log(payload);
 
         try {
-            
-            const res = await createCompany(payload)
+            const res = await createCompany(payload);
             setCompany(payload);
             setIsEditing(false);
         } catch (err) {
@@ -201,9 +180,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                             <span className="text-indigo-400 font-medium">Company Profile</span>
                         </nav>
                         <h1 className="text-3xl font-bold tracking-tight text-white">Company Profile</h1>
-                        <p className="text-sm text-zinc-400">
-                            Set up your organization profile before publishing job listings.
-                        </p>
+                        <p className="text-sm text-zinc-400">Set up your organization profile before publishing job listings.</p>
                     </div>
 
                     <div className="rounded-2xl bg-[#15171e] border border-dashed border-zinc-800 p-10 sm:p-14 text-center flex flex-col items-center justify-center space-y-5">
@@ -213,9 +190,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
 
                         <div className="max-w-md space-y-2">
                             <h2 className="text-xl font-semibold text-white">No Company Registered Yet</h2>
-                            <p className="text-sm text-zinc-400 leading-relaxed">
-                                Register your company details to verify your employer account and start attracting candidates.
-                            </p>
+                            <p className="text-sm text-zinc-400 leading-relaxed">Register your company details to verify your employer account and start attracting candidates.</p>
                         </div>
 
                         <Button
@@ -256,16 +231,12 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
 
                             <div className="flex flex-wrap items-center gap-3">
                                 <h1 className="text-3xl font-bold tracking-tight text-white">{company.name}</h1>
-                                <span
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusInfo.classes}`}
-                                >
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusInfo.classes}`}>
                                     <StatusIcon className="w-3.5 h-3.5" />
                                     {statusInfo.label}
                                 </span>
                             </div>
-                            <p className="text-sm text-zinc-400">
-                                Manage your organization identity and verification details.
-                            </p>
+                            <p className="text-sm text-zinc-400">Manage your organization identity and verification details.</p>
                         </div>
 
                         <div>
@@ -285,21 +256,11 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                         {/* Logo & Primary Identity */}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-5 pb-6 border-b border-zinc-800/80">
                             <div className="w-20 h-20 rounded-2xl bg-[#0d0e12] border border-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
-                                {company.logo ? (
-                                    <img
-                                        src={company.logo}
-                                        alt={`${company.name} logo`}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <Factory className="w-8 h-8 text-zinc-600" />
-                                )}
+                                {company.logo ? <img src={company.logo} alt={`${company.name} logo`} className="w-full h-full object-cover" /> : <Factory className="w-8 h-8 text-zinc-600" />}
                             </div>
 
                             <div className="space-y-1.5">
-                                <div className="text-xs font-medium text-indigo-400 uppercase tracking-wider">
-                                    {company.industry}
-                                </div>
+                                <div className="text-xs font-medium text-indigo-400 uppercase tracking-wider">{company.industry}</div>
                                 <h2 className="text-xl font-semibold text-white">{company.name}</h2>
                                 {company.websiteUrl && (
                                     <a
@@ -344,12 +305,8 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
 
                         {/* Brief Description */}
                         <div className="space-y-2">
-                            <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                                Brief Description
-                            </h3>
-                            <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
-                                {company.description || "No company description provided."}
-                            </p>
+                            <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Brief Description</h3>
+                            <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">{company.description || "No company description provided."}</p>
                         </div>
                     </div>
                 </div>
@@ -361,33 +318,21 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
     // STATE 3: CREATE / EDIT FORM (Matches Screenshot Layout & Reference Style)
     // =========================================================================
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="min-h-screen bg-[#0d0e12] text-zinc-100 py-10 px-4 rounded-2xl lg:m-2 sm:px-8"
-        >
+        <form onSubmit={handleSubmit} className="min-h-screen bg-[#0d0e12] text-zinc-100 py-10 px-4 rounded-2xl lg:m-2 sm:px-8">
             <div className="max-w-4xl mx-auto space-y-10">
                 {/* Top Header & Breadcrumbs */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-1.5">
                         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs">
-                            <Link
-                                href="/dashboard/recruiter"
-                                className="text-zinc-400 hover:text-zinc-200 transition-colors"
-                            >
+                            <Link href="/dashboard/recruiter" className="text-zinc-400 hover:text-zinc-200 transition-colors">
                                 Dashboard
                             </Link>
                             <ChevronRight className="w-3 h-3 text-zinc-600" />
-                            <span className="text-indigo-400 font-medium">
-                                {company ? "Edit Company" : "Register Company"}
-                            </span>
+                            <span className="text-indigo-400 font-medium">{company ? "Edit Company" : "Register Company"}</span>
                         </nav>
 
-                        <h1 className="text-3xl font-bold tracking-tight text-white">
-                            {company ? "Update Company Profile" : "Register Your Company"}
-                        </h1>
-                        <p className="text-sm text-zinc-400">
-                            Provide accurate organization details for admin verification and candidate visibility.
-                        </p>
+                        <h1 className="text-3xl font-bold tracking-tight text-white">{company ? "Update Company Profile" : "Register Your Company"}</h1>
+                        <p className="text-sm text-zinc-400">Provide accurate organization details for admin verification and candidate visibility.</p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -411,11 +356,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                     </div>
                 </div>
 
-                {error && (
-                    <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm">{error}</div>}
 
                 {/* Section 1: Organization Details (2-Column Grid matching Screenshot) */}
                 <section className="space-y-5">
@@ -457,11 +398,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                                     className="w-full h-12 px-3.5 bg-[#15171e] border border-zinc-800/80 hover:border-zinc-700 focus:border-indigo-500 focus:outline-none rounded-xl flex items-center justify-between text-sm text-zinc-200 transition-colors"
                                 >
                                     <span>{formData.industry}</span>
-                                    <ChevronDown
-                                        className={`w-4 h-4 text-zinc-400 transition-transform ${
-                                            openIndustry ? "rotate-180" : ""
-                                        }`}
-                                    />
+                                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${openIndustry ? "rotate-180" : ""}`} />
                                 </button>
 
                                 {openIndustry && (
@@ -474,9 +411,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                                                     setOpenIndustry(false);
                                                 }}
                                                 className={`px-3 py-2.5 text-sm cursor-pointer transition-colors ${
-                                                    formData.industry === ind
-                                                        ? "bg-indigo-600/20 text-indigo-400 font-medium"
-                                                        : "text-zinc-300 hover:bg-zinc-800/60"
+                                                    formData.industry === ind ? "bg-indigo-600/20 text-indigo-400 font-medium" : "text-zinc-300 hover:bg-zinc-800/60"
                                                 }`}
                                             >
                                                 {ind}
@@ -494,9 +429,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                                     Website URL <span className="text-indigo-400">*</span>
                                 </label>
                                 <div className="flex items-center h-12 bg-[#15171e] border border-zinc-800/80 hover:border-zinc-700 focus-within:border-indigo-500 rounded-xl overflow-hidden transition-colors">
-                                    <span className="h-full px-3.5 flex items-center bg-[#1c1f29] border-r border-zinc-800/80 text-zinc-400 text-sm select-none">
-                                        https://
-                                    </span>
+                                    <span className="h-full px-3.5 flex items-center bg-[#1c1f29] border-r border-zinc-800/80 text-zinc-400 text-sm select-none">https://</span>
                                     <input
                                         type="text"
                                         name="websiteUrl"
@@ -546,11 +479,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                                     className="w-full h-12 px-3.5 bg-[#15171e] border border-zinc-800/80 hover:border-zinc-700 focus:border-indigo-500 focus:outline-none rounded-xl flex items-center justify-between text-sm text-zinc-200 transition-colors"
                                 >
                                     <span>{formData.employeeCount}</span>
-                                    <ChevronDown
-                                        className={`w-4 h-4 text-zinc-400 transition-transform ${
-                                            openEmployees ? "rotate-180" : ""
-                                        }`}
-                                    />
+                                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${openEmployees ? "rotate-180" : ""}`} />
                                 </button>
 
                                 {openEmployees && (
@@ -563,9 +492,7 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
                                                     setOpenEmployees(false);
                                                 }}
                                                 className={`px-3 py-2.5 text-sm cursor-pointer transition-colors ${
-                                                    formData.employeeCount === range
-                                                        ? "bg-indigo-600/20 text-indigo-400 font-medium"
-                                                        : "text-zinc-300 hover:bg-zinc-800/60"
+                                                    formData.employeeCount === range ? "bg-indigo-600/20 text-indigo-400 font-medium" : "text-zinc-300 hover:bg-zinc-800/60"
                                                 }`}
                                             >
                                                 {range}
@@ -577,41 +504,20 @@ export default function CompanyProfileManager({ initialCompany, recruiter }) {
 
                             {/* Company Logo Upload (ImgBB) */}
                             <div>
-                                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                                    Company Logo
-                                </label>
+                                <label className="block text-xs font-medium text-zinc-300 mb-1.5">Company Logo</label>
                                 <div className="flex items-center gap-3.5">
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        onChange={handleLogoUpload}
-                                        className="hidden"
-                                    />
+                                    <input ref={fileInputRef} type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleLogoUpload} className="hidden" />
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
                                         disabled={uploadingLogo}
                                         className="w-12 h-12 rounded-xl bg-[#15171e] border border-dashed border-zinc-700 hover:border-indigo-500 flex items-center justify-center text-zinc-300 transition-colors overflow-hidden shrink-0"
                                     >
-                                        {formData.logo ? (
-                                            <img
-                                                src={formData.logo}
-                                                alt="Logo preview"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <ArrowUpFromLine className="w-4 h-4 text-zinc-400" />
-                                        )}
+                                        {formData.logo ? <img src={formData.logo} alt="Logo preview" className="w-full h-full object-cover" /> : <ArrowUpFromLine className="w-4 h-4 text-zinc-400" />}
                                     </button>
 
-                                    <div
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="cursor-pointer select-none"
-                                    >
-                                        <p className="text-sm font-medium text-zinc-200 hover:text-indigo-400 transition-colors">
-                                            {uploadingLogo ? "Uploading to ImgBB..." : "Upload image"}
-                                        </p>
+                                    <div onClick={() => fileInputRef.current?.click()} className="cursor-pointer select-none">
+                                        <p className="text-sm font-medium text-zinc-200 hover:text-indigo-400 transition-colors">{uploadingLogo ? "Uploading to ImgBB..." : "Upload image"}</p>
                                         <p className="text-xs text-zinc-500">PNG, JPG up to 5MB</p>
                                     </div>
                                 </div>
