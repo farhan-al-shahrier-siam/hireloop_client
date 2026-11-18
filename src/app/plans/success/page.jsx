@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { stripe } from "@/lib/stripe";
 import { Card, Chip } from "@heroui/react";
 import { CircleCheck, ArrowRight, Sparkles, Briefcase, House, Receipt, Envelope } from "@gravity-ui/icons";
+import { createSubscription } from "@/lib/actions/subscriptions";
 
 export default async function SuccessPage({ searchParams }) {
     const { session_id, role = "seeker" } = await searchParams;
@@ -33,6 +34,13 @@ export default async function SuccessPage({ searchParams }) {
     const customerEmail = session.customer_details?.email || "your email";
     const lineItem = session.line_items?.data?.[0];
     const productName = lineItem?.price?.product?.name || lineItem?.description || "Pro Plan";
+    const subsInfo ={
+        email: customerEmail,
+        planId: session.metadata.planId,
+    }
+
+    // saves data to the data base
+    const res = await createSubscription(subsInfo)
 
     const amountTotal = typeof session.amount_total === "number" ? `$${(session.amount_total / 100).toFixed(2)}` : null;
 
