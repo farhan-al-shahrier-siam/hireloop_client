@@ -9,6 +9,7 @@ const PRICING_DATA = {
     seekers: [
         {
             name: "Free",
+            id: "seeker_free",
             price: "$0",
             period: "/forever",
             description: "Essential tools to explore opportunities and start applying.",
@@ -19,6 +20,7 @@ const PRICING_DATA = {
         },
         {
             name: "Pro",
+            id: "seeker_pro",
             price: "$19",
             period: "/month",
             description: "More monthly applications and deeper insights to land faster.",
@@ -29,44 +31,48 @@ const PRICING_DATA = {
         },
         {
             name: "Premium",
+            id: "seeker_premium",
             price: "$39",
             period: "/month",
             description: "Unlimited applications and top visibility for active job hunters.",
             popular: false,
             ctaText: "Go Premium",
-            ctaHref: "/signUp?role=seeker&plan=premium",
+            ctaHref: "/api/checkout_sessions",
             features: ["Everything in Pro", "Unlimited applications", "Profile boost to recruiters", "Early access to new jobs", "Priority support"],
         },
     ],
     recruiters: [
         {
             name: "Free",
+            id: "recruiter_free",
             price: "$0",
             period: "/forever",
             description: "Great for a company's first year of hiring and early team growth.",
             popular: false,
             ctaText: "Start Hiring Free",
-            ctaHref: "/signUp?role=recruiter&plan=free",
+            ctaHref: "/api/checkout_sessions",
             features: ["Up to 3 active job posts", "Basic applicant management", "Standard listing visibility"],
         },
         {
             name: "Growth",
+            id: "recruiter_growth",
             price: "$49",
             period: "/month",
             description: "Streamlined applicant tracking and analytics for scaling teams.",
             popular: true,
             ctaText: "Choose Growth",
-            ctaHref: "/signUp?role=recruiter&plan=growth",
+            ctaHref: "/api/checkout_sessions",
             features: ["Up to 10 active job posts", "Applicant tracking", "Basic analytics", "Email support"],
         },
         {
             name: "Enterprise",
+            id: "recruiter_enterprise",
             price: "$149",
             period: "/month",
             description: "Full-scale hiring power with featured placements and branding.",
             popular: false,
             ctaText: "Choose Enterprise",
-            ctaHref: "/signUp?role=recruiter&plan=enterprise",
+            ctaHref: "/api/checkout_sessions",
             features: ["Up to 50 active job posts", "Advanced analytics dashboard", "Featured job listings", "Team collaboration", "Custom branding", "Priority support"],
         },
     ],
@@ -189,6 +195,7 @@ export default function PlansPage() {
                                 {/* CTA Button */}
                                 <div className="pt-4">
                                     <form action={plan.ctaHref} method="POST" className="w-full">
+                                        <input type="hidden" name="plan_id" value={plan.id} />
                                         <button
                                             type="submit"
                                             className={`group flex w-full cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${
