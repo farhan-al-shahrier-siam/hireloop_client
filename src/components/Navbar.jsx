@@ -4,15 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import * as motion from "motion/react-client"
+import * as motion from "motion/react-client";
 import { Box } from "@gravity-ui/icons";
-
-
-const navLinks = [
-    { label: "Browse Jobs", href: "/jobs" },
-    { label: "Companies", href: "/companies" },
-    { label: "Pricing", href: "/plans" },
-];
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,6 +25,24 @@ export default function Navbar() {
         router.push("/");
         router.refresh();
     };
+
+    const navLinks = [
+        { label: "Browse Jobs", href: "/jobs" },
+        { label: "Companies", href: "/companies" },
+        { label: "Pricing", href: "/plans" },
+    ];
+
+    const dashBoardLinks = {
+        seeker: "/dashboard/seeker",
+        recruiter: "/dashboard/recruiter",
+    };
+
+    if (user?.email) {
+        navLinks.push({
+            label: "DashBoard",
+            href: dashBoardLinks[user?.role || "seeker"],
+        });
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full px-4 py-4 sm:px-6 lg:px-8">
