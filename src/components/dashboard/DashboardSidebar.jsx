@@ -1,10 +1,9 @@
 import { getUserSession } from "@/lib/core/session";
-import { Bars, Bell, Bookmark, Briefcase, Envelope, FileDollar, FileText, Gear, LayoutCellsLarge, Magnifier, Person } from "@gravity-ui/icons";
+import { Bars, Bell, Bookmark, Briefcase, Envelope, Factory, FileDollar, FileText, Gear, LayoutCellsLarge, Magnifier, Person, Persons } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 import Link from "next/link";
 
 export async function DashboardSidebar() {
-
     const user = await getUserSession();
 
     const seekerNavItems = [
@@ -26,10 +25,20 @@ export async function DashboardSidebar() {
         { icon: Gear, href: "/settings", label: "Settings" },
     ];
 
-    const navLinksMap={
+    const adminNavItems = [
+        { icon: LayoutCellsLarge, href: "/dashboard/admin", label: "Dashboard" },
+        { icon: Persons, href: "/dashboard/admin/users", label: "Users" },
+        { icon: Factory, href: "/dashboard/admin/companies", label: "Companies" },
+        { icon: Briefcase, href: "/dashboard/admin/jobs", label: "Jobs" },
+        { icon: FileDollar, href: "/dashboard/admin/payments", label: "Payments" },
+        { icon: Gear, href: "/settings", label: "Settings" },
+    ];
+
+    const navLinksMap = {
         seeker: seekerNavItems,
-        recruiter : reecruiterNavItems,
-    }
+        recruiter: reecruiterNavItems,
+        admin: adminNavItems,
+    };
 
     const navItems = navLinksMap[user?.role || "seeker"];
 
