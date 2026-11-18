@@ -7,6 +7,7 @@ import { getJobById } from "@/lib/api/jobs";
 import { getApplicationByApplicantId } from "@/lib/api/applications";
 import { Card } from "@heroui/react";
 import { ShieldExclamation, CircleCheck, TriangleExclamation, ArrowLeft } from "@gravity-ui/icons";
+import { getPlansById } from "@/lib/api/plans";
 
 const ApplyPage = async ({ params }) => {
     const { id } = await params;
@@ -40,10 +41,14 @@ const ApplyPage = async ({ params }) => {
     }
 
     const applications = await getApplicationByApplicantId(user.id);
-    const plan = {
+
+    const plan = await getPlansById(user?.plan || "seeker_free")
+
+    /* const plan = {
+        id: "seeker_free",
         name: "Free",
         maxApplicationPerMonth: 3,
-    };
+    }; */
 
     const job = await getJobById(id);
 

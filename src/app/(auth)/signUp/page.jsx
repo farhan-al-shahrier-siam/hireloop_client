@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Label, Radio, RadioGroup } from "@heroui/react";
 
 export default function SignUp() {
@@ -23,12 +23,16 @@ export default function SignUp() {
         setError("");
         setSuccess("");
 
+        const role = e.target.role.value;
+        const plan = role === "seeker" ? "seeker_free" : "recruiter_free";
+
         try {
             const { data, error } = await authClient.signUp.email({
                 name: e.target.name.value,
                 email: e.target.email.value,
                 password: e.target.password.value,
-                role: e.target.role.value,
+                role,
+                plan,
             });
 
             if (error) {
@@ -36,12 +40,12 @@ export default function SignUp() {
             } else {
                 setSuccess("Account created successfully! Welcome aboard.");
                 e.target.reset();
+                router.push(redirectTo);
             }
         } catch (err) {
             setError("Unable to create your account. Please try again.");
         } finally {
             setLoading(false);
-            router.push(redirectTo);
         }
     };
 

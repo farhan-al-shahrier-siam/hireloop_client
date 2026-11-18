@@ -56,9 +56,6 @@ const JobApplyForm = ({ job, applicant }) => {
 
         // console.log("Application Object:", applicationPayload);
 
-        // TODO: Call your save application API here
-        // await applyToJob(applicationPayload);
-
         const res = await submitApplication(applicationPayload);
         // console.log(res);
         if (res.insertedId) {
