@@ -1,5 +1,17 @@
 "use server";
 
+import { getToken } from "./session";
+
+export const authHeader = async () => {
+    const token = await getToken();
+    const header = token
+        ? {
+              authorization: `Bearer ${token}`,
+          }
+        : {};
+    return header;
+};
+
 const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export const serverFetch = async (path) => {
@@ -12,6 +24,7 @@ export const serverMutation = async (path, data, method = "POST") => {
         method: method,
         headers: {
             "content-type": "application/json",
+            ... await authHeader()
         },
         body: JSON.stringify(data),
     });
