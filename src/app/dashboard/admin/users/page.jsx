@@ -13,7 +13,7 @@ const AdminUsersPage = async () => {
         status: user.status || "Active",
     }));
 
-    return <UserManagementClient initialUsers={users} />;
+    return <UserManagementClient users={users} />;
 };
 
 export default AdminUsersPage;

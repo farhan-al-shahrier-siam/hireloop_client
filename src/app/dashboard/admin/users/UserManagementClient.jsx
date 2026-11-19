@@ -1,24 +1,33 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Avatar, Button, Card, Chip, ListBox, Select, Table } from "@heroui/react";
+import { AlertDialog, Avatar, Button, Card, Chip, ListBox, Select, Table } from "@heroui/react";
 import { Briefcase, Person, Shield } from "@gravity-ui/icons";
+import { updateUsersRole } from "@/lib/actions/users";
 
-const UserManagementClient = ({ initialUsers = [] }) => {
-    const [users, setUsers] = useState(initialUsers);
+const UserManagementClient = ({ users = [] }) => {
+    const [userList, setUserList] = useState(users);
+    const [prevUsers, setPrevUsers] = useState(users);
     const [roleFilter, setRoleFilter] = useState("all");
-    // 1. Add this state near the top of UserManagementClient
     const [oneDayAgo] = useState(() => Date.now() - 24 * 60 * 60 * 1000);
 
-    // 2. Inside useMemo, remove `const oneDayAgo = ...` and add `oneDayAgo` to the dependency array:
+    // Confirmation Dialog State
+    const [confirmAction, setConfirmAction] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    if (users !== prevUsers) {
+        setPrevUsers(users);
+        setUserList(users);
+    }
+
     const stats = useMemo(() => {
-        const totalUsers = users.length;
-        const activeUsers = users.filter((u) => (u.status || "Active") === "Active").length;
-        const recruiterCount = users.filter((u) => u.role === "recruiter").length;
-        const suspendedCount = users.filter((u) => u.status === "Suspended").length;
+        const totalUsers = userList.length;
+        const activeUsers = userList.filter((u) => (u.status || "Active") === "Active").length;
+        const recruiterCount = userList.filter((u) => u.role === "recruiter").length;
+        const suspendedCount = userList.filter((u) => u.status === "Suspended").length;
         const suspendedPercent = totalUsers > 0 ? ((suspendedCount / totalUsers) * 100).toFixed(1) : "0.0";
 
-        const recentSignups = users.filter((u) => new Date(u.createdAt).getTime() >= oneDayAgo).length;
+        const recentSignups = userList.filter((u) => new Date(u.createdAt).getTime() >= oneDayAgo).length;
 
         return {
             activeUsers,
@@ -27,13 +36,13 @@ const UserManagementClient = ({ initialUsers = [] }) => {
             suspendedPercent,
             recentSignups,
         };
-    }, [users, oneDayAgo]);
+    }, [userList, oneDayAgo]);
 
     // Filtered Users by Role
     const filteredUsers = useMemo(() => {
-        if (roleFilter === "all") return users;
-        return users.filter((user) => user.role === roleFilter);
-    }, [users, roleFilter]);
+        if (roleFilter === "all") return userList;
+        return userList.filter((user) => user.role === roleFilter);
+    }, [userList, roleFilter]);
 
     // Format ISO Date -> "Oct 12, 2023"
     const formatJoinDate = (isoString) => {
@@ -60,22 +69,70 @@ const UserManagementClient = ({ initialUsers = [] }) => {
         document.body.removeChild(link);
     };
 
-    // Action Handlers
-    const handleToggleRole = async (userId, currentRole) => {
-        const nextRole = currentRole === "recruiter" ? "seeker" : "recruiter";
-        setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, role: nextRole } : u)));
-        // TODO: await updateUserRole(userId, nextRole);
+    // Open Confirmation Dialog Helpers
+    const promptRoleChange = (user, nextRole) => {
+        const roleLabel = nextRole.charAt(0).toUpperCase() + nextRole.slice(1);
+        setConfirmAction({
+            type: "role",
+            user,
+            nextRole,
+            title: `Change Role to ${roleLabel}?`,
+            description: `Are you sure you want to change ${user.name}'s role from ${user.role} to ${nextRole}?`,
+            confirmText: `Make ${roleLabel}`,
+            status: nextRole === "admin" ? "warning" : "accent",
+            confirmVariant: "primary",
+        });
     };
 
-    const handleToggleSuspend = async (userId, currentStatus) => {
-        const nextStatus = currentStatus === "Suspended" ? "Active" : "Suspended";
-        setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, status: nextStatus } : u)));
-        // TODO: await updateUserStatus(userId, nextStatus);
+    const promptStatusChange = (user) => {
+        const isSuspended = user.status === "Suspended";
+        const nextStatus = isSuspended ? "Active" : "Suspended";
+        setConfirmAction({
+            type: "status",
+            user,
+            nextStatus,
+            title: isSuspended ? "Activate User Account?" : "Suspend User Account?",
+            description: isSuspended ? `Restore platform access for ${user.name} (${user.email})?` : `Suspend ${user.name} (${user.email})? They will immediately lose access to their account.`,
+            confirmText: isSuspended ? "Activate" : "Suspend",
+            status: isSuspended ? "success" : "danger",
+            confirmVariant: isSuspended ? "primary" : "danger",
+        });
     };
 
-    const handleDeleteUser = async (userId) => {
-        setUsers((prev) => prev.filter((u) => u._id !== userId));
-        // TODO: await deleteUser(userId);
+    const promptDeleteUser = (user) => {
+        setConfirmAction({
+            type: "delete",
+            user,
+            title: "Delete User Permanently?",
+            description: `Are you sure you want to delete ${user.name} (${user.email})? This action cannot be undone.`,
+            confirmText: "Delete User",
+            status: "danger",
+            confirmVariant: "danger",
+        });
+    };
+
+    // Execute Confirmed Action
+    const handleConfirmAction = async () => {
+        if (!confirmAction) return;
+        setIsSubmitting(true);
+
+        try {
+            const { type, user, nextRole, nextStatus } = confirmAction;
+
+            if (type === "role") {
+                await updateUsersRole(user._id, nextRole);
+                setUserList((prev) => prev.map((u) => (u._id === user._id ? { ...u, role: nextRole } : u)));
+            } else if (type === "status") {
+                // TODO: await updateUserStatus(user._id, nextStatus);
+                setUserList((prev) => prev.map((u) => (u._id === user._id ? { ...u, status: nextStatus } : u)));
+            } else if (type === "delete") {
+                // TODO: await deleteUser(user._id);
+                setUserList((prev) => prev.filter((u) => u._id !== user._id));
+            }
+        } finally {
+            setIsSubmitting(false);
+            setConfirmAction(null);
+        }
     };
 
     const getInitials = (name = "") =>
@@ -167,7 +224,7 @@ const UserManagementClient = ({ initialUsers = [] }) => {
             {/* Users Table */}
             <Table className="rounded-2xl border border-default-200 bg-content1">
                 <Table.ScrollContainer>
-                    <Table.Content aria-label="Users management table" className="min-w-[820px] w-full text-left">
+                    <Table.Content aria-label="Users management table" className="min-w-[920px] w-full text-left">
                         <Table.Header className="border-b border-default-200 bg-default-50/50 text-xs font-semibold uppercase tracking-wider text-default-500">
                             <Table.Column id="name" isRowHeader className="px-6 py-4">
                                 USER NAME
@@ -249,40 +306,46 @@ const UserManagementClient = ({ initialUsers = [] }) => {
 
                                         {/* Actions */}
                                         <Table.Cell className="px-6 py-4 text-right">
-                                            <div className="inline-flex items-center justify-end gap-4 text-xs font-medium">
+                                            <div className="inline-flex items-center justify-end gap-3.5 whitespace-nowrap text-xs font-medium">
                                                 {isSuspended ? (
                                                     <>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleToggleSuspend(user._id, user.status)}
-                                                            className="cursor-pointer text-success transition-opacity hover:opacity-80"
-                                                        >
+                                                        <button type="button" onClick={() => promptStatusChange(user)} className="cursor-pointer text-success transition-opacity hover:opacity-80">
                                                             Activate
                                                         </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleDeleteUser(user._id)}
-                                                            className="cursor-pointer text-default-400 transition-colors hover:text-danger"
-                                                        >
+                                                        <button type="button" onClick={() => promptDeleteUser(user)} className="cursor-pointer text-default-400 transition-colors hover:text-danger">
                                                             Delete
                                                         </button>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        {!isAdmin && (
+                                                        {user.role !== "seeker" && (
                                                             <button
                                                                 type="button"
-                                                                onClick={() => handleToggleRole(user._id, user.role)}
+                                                                onClick={() => promptRoleChange(user, "seeker")}
                                                                 className="cursor-pointer text-default-400 transition-colors hover:text-foreground"
                                                             >
-                                                                {isRecruiter ? "Make Seeker" : "Make Recruiter"}
+                                                                Make Seeker
                                                             </button>
                                                         )}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleToggleSuspend(user._id, user.status)}
-                                                            className="cursor-pointer text-danger transition-opacity hover:opacity-80"
-                                                        >
+                                                        {user.role !== "recruiter" && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => promptRoleChange(user, "recruiter")}
+                                                                className="cursor-pointer text-default-400 transition-colors hover:text-foreground"
+                                                            >
+                                                                Make Recruiter
+                                                            </button>
+                                                        )}
+                                                        {user.role !== "admin" && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => promptRoleChange(user, "admin")}
+                                                                className="cursor-pointer text-warning transition-opacity hover:opacity-80"
+                                                            >
+                                                                Make Admin
+                                                            </button>
+                                                        )}
+                                                        <button type="button" onClick={() => promptStatusChange(user)} className="cursor-pointer text-danger transition-opacity hover:opacity-80">
                                                             Suspend
                                                         </button>
                                                     </>
@@ -296,6 +359,32 @@ const UserManagementClient = ({ initialUsers = [] }) => {
                     </Table.Content>
                 </Table.ScrollContainer>
             </Table>
+
+            {/* Confirmation AlertDialog */}
+            <AlertDialog isOpen={Boolean(confirmAction)} onOpenChange={(open) => !open && !isSubmitting && setConfirmAction(null)}>
+                <AlertDialog.Backdrop>
+                    <AlertDialog.Container>
+                        <AlertDialog.Dialog className="sm:max-w-[420px]">
+                            <AlertDialog.CloseTrigger isDisabled={isSubmitting} />
+                            <AlertDialog.Header>
+                                <AlertDialog.Icon status={confirmAction?.status || "warning"} />
+                                <AlertDialog.Heading>{confirmAction?.title}</AlertDialog.Heading>
+                            </AlertDialog.Header>
+                            <AlertDialog.Body>
+                                <p className="text-sm text-default-500">{confirmAction?.description}</p>
+                            </AlertDialog.Body>
+                            <AlertDialog.Footer>
+                                <Button slot="close" variant="tertiary" isDisabled={isSubmitting}>
+                                    Cancel
+                                </Button>
+                                <Button variant={confirmAction?.confirmVariant || "primary"} isDisabled={isSubmitting} onPress={handleConfirmAction}>
+                                    {isSubmitting ? "Processing..." : confirmAction?.confirmText}
+                                </Button>
+                            </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                    </AlertDialog.Container>
+                </AlertDialog.Backdrop>
+            </AlertDialog>
         </section>
     );
 };
