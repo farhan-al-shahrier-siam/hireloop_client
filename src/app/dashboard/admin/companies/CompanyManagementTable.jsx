@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { Table, Avatar, Chip, Button, Input, Modal, Tabs, Separator } from "@heroui/react";
-import { Magnifier, Check, Xmark, Eye, ArrowUpRightFromSquare, MapPin, Persons, Calendar, Briefcase } from "@gravity-ui/icons";
+import { Magnifier, Check, Xmark, Eye, ArrowUpRightFromSquare, MapPin, Persons, Calendar, Briefcase, PinFill } from "@gravity-ui/icons";
 import { updateCompany } from "@/lib/actions/companies";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -121,11 +121,12 @@ export default function CompanyManagementTable({ initialCompanies = [] }) {
             {/* Responsive Table Container */}
             <Table>
                 <Table.ScrollContainer className="overflow-x-auto rounded-2xl border border-default-200 bg-background shadow-xs">
-                    <Table.Content aria-label="Companies for review" className="min-w-[820px]">
+                    <Table.Content aria-label="Companies for review" className="min-w-205">
                         <Table.Header>
                             <Table.Column isRowHeader>Company</Table.Column>
                             <Table.Column>Industry & Size</Table.Column>
                             <Table.Column>Location</Table.Column>
+                            <Table.Column>Jobs Count</Table.Column>
                             <Table.Column>Submitted</Table.Column>
                             <Table.Column>Status</Table.Column>
                             <Table.Column className="text-right">Actions</Table.Column>
@@ -160,7 +161,7 @@ export default function CompanyManagementTable({ initialCompanies = [] }) {
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                                                         >
-                                                            <span className="max-w-[180px] truncate">{company.websiteUrl.replace(/^https?:\/\//, "")}</span>
+                                                            <span className="max-w-45 truncate">{company.websiteUrl.replace(/^https?:\/\//, "")}</span>
                                                             <ArrowUpRightFromSquare className="size-3 shrink-0" />
                                                         </a>
                                                     )}
@@ -181,6 +182,12 @@ export default function CompanyManagementTable({ initialCompanies = [] }) {
                                             <span className="inline-flex items-center gap-1.5 text-sm text-default-600">
                                                 <MapPin className="size-3.5 shrink-0 text-default-400" />
                                                 {company.location || "Remote"}
+                                            </span>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <span className="inline-flex items-center gap-1.5 text-sm text-default-600">
+                                                <PinFill className="size-3.5 shrink-0 text-default-400" />
+                                                {company.jobCount}
                                             </span>
                                         </Table.Cell>
 
