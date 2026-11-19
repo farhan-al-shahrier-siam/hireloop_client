@@ -16,6 +16,12 @@ const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export const serverFetch = async (path) => {
     const res = await fetch(`${baseUrl}${path}`);
+};
+
+export const protectedServerFetch = async (path) => {
+    const res = await fetch(`${baseUrl}${path}`, {
+        headers: await authHeader(),
+    });
     return res.json();
 };
 
@@ -24,7 +30,7 @@ export const serverMutation = async (path, data, method = "POST") => {
         method: method,
         headers: {
             "content-type": "application/json",
-            ... await authHeader()
+            ...(await authHeader()),
         },
         body: JSON.stringify(data),
     });
