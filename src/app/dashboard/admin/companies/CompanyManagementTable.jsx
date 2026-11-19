@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from "react";
 import { Table, Avatar, Chip, Button, Input, Modal, Tabs, Separator } from "@heroui/react";
 import { Magnifier, Check, Xmark, Eye, ArrowUpRightFromSquare, MapPin, Persons, Calendar, Briefcase } from "@gravity-ui/icons";
+import { updateCompany } from "@/lib/actions/companies";
+import toast, { Toaster } from "react-hot-toast";
 
 const STATUS_COLOR_MAP = {
     Approved: "success",
@@ -48,13 +50,14 @@ export default function CompanyManagementTable({ initialCompanies = [] }) {
         setUpdatingId(companyId);
         try {
             // Replace with your actual API endpoint or server action
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/companies/${companyId}/status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
-            });
-
-            if (!res.ok) throw new Error("Failed to update company status");
+            const res = await updateCompany(companyId, { status: newStatus });
+            // console.log(res);
+            if(res.modifiedCount>0 && newStatus === "Approved"){
+                toast.success('Approved!');
+            }
+            if(res.modifiedCount>0 && newStatus === "Rejected"){
+                toast.error('Rejected!');
+            }
 
             setCompanies((prev) => prev.map((c) => (c._id === companyId ? { ...c, status: newStatus } : c)));
 
@@ -349,6 +352,7 @@ export default function CompanyManagementTable({ initialCompanies = [] }) {
                     </Modal.Container>
                 </Modal.Backdrop>
             </Modal>
+            <Toaster></Toaster>
         </div>
     );
 }
