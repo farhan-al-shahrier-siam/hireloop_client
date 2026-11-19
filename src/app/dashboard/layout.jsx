@@ -3,9 +3,9 @@ import React from "react";
 
 const DashboardLayout = ({ children }) => {
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen flex-col xl:flex-row">
             <DashboardSidebar></DashboardSidebar>
-            <div className="flex-1">{children}</div>
+            <div className="min-w-0 flex-1">{children}</div>
         </div>
     );
 };

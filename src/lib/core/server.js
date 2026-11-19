@@ -44,7 +44,7 @@ const handleStatus = (res) => {
         redirect("/unauthorized");
     }
     if (res.status === 403) {
-        redirect("/unauthorized");
+        redirect("/forbidden");
     }
-    res.json();
+    return res.json();
 };

@@ -1,6 +1,5 @@
 import { getUserSession } from "@/lib/core/session";
-import { Bars, Bell, Bookmark, Briefcase, Envelope, Factory, FileDollar, FileText, Gear, LayoutCellsLarge, Magnifier, Person, Persons } from "@gravity-ui/icons";
-import { Button, Drawer } from "@heroui/react";
+import { Bell, Bookmark, Briefcase, Envelope, Factory, FileDollar, FileText, Gear, LayoutCellsLarge, Magnifier, Person, Persons } from "@gravity-ui/icons";
 import Link from "next/link";
 
 export async function DashboardSidebar() {
@@ -42,37 +41,21 @@ export async function DashboardSidebar() {
 
     const navItems = navLinksMap[user?.role || "seeker"];
 
-    const navContent = (
-        <nav className="flex flex-col gap-1">
-            {navItems.map((item) => (
-                <Link href={item.href} key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-default" type="Link">
-                    <item.icon className="size-5 text-muted" />
-                    {item.label}
-                </Link>
-            ))}
-        </nav>
-    );
-
     return (
-        <>
-            <aside className="hidden w-64 shrink-0 border rounded-2xl m-2 border-default p-4 lg:block">{navContent}</aside>
-            <Drawer>
-                <Button className={"lg:hidden"} variant="secondary">
-                    <Bars />
-                    Sidebar
-                </Button>
-                <Drawer.Backdrop>
-                    <Drawer.Content placement="left">
-                        <Drawer.Dialog>
-                            <Drawer.CloseTrigger />
-                            <Drawer.Header>
-                                <Drawer.Heading>Navigation</Drawer.Heading>
-                            </Drawer.Header>
-                            <Drawer.Body>{navContent}</Drawer.Body>
-                        </Drawer.Dialog>
-                    </Drawer.Content>
-                </Drawer.Backdrop>
-            </Drawer>
-        </>
+        <aside className="m-2 shrink-0 rounded-2xl border border-default p-2 xl:w-64 xl:p-4">
+            <nav className="flex flex-row items-center gap-1 overflow-x-auto xl:flex-col xl:items-stretch">
+                {navItems.map((item) => (
+                    <Link
+                        href={item.href}
+                        key={item.label}
+                        className="flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-sm whitespace-nowrap text-foreground transition-colors hover:bg-default xl:gap-3 xl:py-2.5"
+                        type="Link"
+                    >
+                        <item.icon className="size-5 text-muted" />
+                        {item.label}
+                    </Link>
+                ))}
+            </nav>
+        </aside>
     );
 }
