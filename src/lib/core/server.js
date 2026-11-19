@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { getToken } from "./session";
 
 export const authHeader = async () => {
@@ -23,7 +24,7 @@ export const protectedServerFetch = async (path) => {
     const res = await fetch(`${baseUrl}${path}`, {
         headers: await authHeader(),
     });
-    return res.json();
+    return handleStatus(res);
 };
 
 export const serverMutation = async (path, data, method = "POST") => {
@@ -35,5 +36,15 @@ export const serverMutation = async (path, data, method = "POST") => {
         },
         body: JSON.stringify(data),
     });
-    return res.json();
+    return handleStatus(res);
+};
+
+const handleStatus = (res) => {
+    if (res.status === 401) {
+        redirect("/unauthorized");
+    }
+    if (res.status === 403) {
+        redirect("/unauthorized");
+    }
+    res.json();
 };
